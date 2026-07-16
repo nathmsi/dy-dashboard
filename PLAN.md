@@ -1,13 +1,14 @@
 # Projet end-to-end : Vite + React + TS + CI/CD complet
 
-**But** : construire une app réelle, la mettre sur GitHub, et monter un pipeline CI/CD complet — pour comprendre *en faisant* tout ce qu'on a vu dans le refresh. L'app est volontairement simple ; le cœur de l'exercice, c'est l'infra autour.
+**But** : construire une app réelle, la mettre sur GitHub, et monter un pipeline CI/CD complet — pour comprendre _en faisant_ tout ce qu'on a vu dans le refresh. L'app est volontairement simple ; le cœur de l'exercice, c'est l'infra autour.
 
 **L'app** : un mini **dashboard de personnalisation** (clin d'œil à la console Dynamic Yield) — plusieurs pages avec un routing simple : une liste de "campagnes" (table triable + recherche) et une page de détail par campagne. Assez riche pour tester des composants, le state management, l'accessibilité et la perf ; assez simple pour tenir en une session ou deux.
 
 **La stack** :
+
 - **Vite + React + TypeScript** — build & langage
 - **React Router** — routing (plusieurs pages)
-- **Zustand** — state global client (recherche, tri, sélection) — *c'est leur choix chez DY*
+- **Zustand** — state global client (recherche, tri, sélection) — _c'est leur choix chez DY_
 - **TanStack Query (React Query)** — server state (les données "API")
 - **CSS Modules** — styling scopé (design tokens en variables CSS)
 - **Vitest + RTL + Playwright** — tests
@@ -39,6 +40,7 @@ pnpm dev
 **Ce qui se passe** : Vite génère un squelette React + TypeScript. `pnpm dev` lance le dev server (esbuild + ESM natif → démarrage instantané, HMR actif).
 
 **Regarde et comprends** :
+
 - `vite.config.ts` — la config du bundler.
 - `tsconfig.json` — la config TypeScript.
 - `package.json` — les scripts (`dev`, `build`, `preview`).
@@ -60,7 +62,7 @@ git commit -m "chore: scaffold vite react-ts"
 
 ## Phase 2 — Tooling qualité (20 min)
 
-Objectif : mettre les garde-fous *avant* d'écrire du code.
+Objectif : mettre les garde-fous _avant_ d'écrire du code.
 
 **ESLint + Prettier** :
 
@@ -123,11 +125,13 @@ src/
 **Le point senior** : le dossier `components/ui/` est ta "mini librairie de composants". Tu la conçois pour être **consommée** — props claires, accessibilité intégrée.
 
 **Ce que l'app fait** :
+
 - Route `/` → **DashboardPage** : table de campagnes triable + recherche.
 - Route `/campaigns/:id` → **CampaignDetailPage** : le détail d'une campagne.
 - Le state partagé (recherche, tri, sélection) vit dans un store Zustand ; les données viennent d'une "API" mock via React Query.
 
 **Accessibilité à intégrer dès le début** (revient partout dans l'offre) :
+
 - Table avec `<th scope="col">`, tri annoncé via `aria-sort`.
 - Recherche avec `<label>` associé.
 - Navigation clavier : lignes focusables, `Enter` pour ouvrir le détail, focus géré dans le panneau.
@@ -185,7 +189,7 @@ export const useCampaignStore = create<CampaignState>((set) => ({
 Lecture **par sélecteur** :
 
 ```ts
-const search = useCampaignStore((s) => s.search)      // re-render SEULEMENT si search change
+const search = useCampaignStore((s) => s.search) // re-render SEULEMENT si search change
 const setSearch = useCampaignStore((s) => s.setSearch)
 ```
 
@@ -198,6 +202,7 @@ pnpm add @tanstack/react-query
 ```
 
 Distinction à poser en entretien : **client state ≠ server state.**
+
 - **Zustand** = état de l'UI (recherche, tri, sélection, thème).
 - **React Query** = données qui viennent d'une API (cache, loading, erreurs, refetch, dédup).
 
@@ -222,7 +227,7 @@ const { data, isLoading, error } = useQuery({
 - **`useCallback`** : stabiliser une **fonction** passée à un composant enfant mémoïsé.
 - **Custom hook** : extraire une logique réutilisable (`useCampaigns()`).
 
-Règle d'or : *"je n'optimise pas prématurément ; useMemo/useCallback seulement quand il y a un vrai coût, pas par réflexe."*
+Règle d'or : _"je n'optimise pas prématurément ; useMemo/useCallback seulement quand il y a un vrai coût, pas par réflexe."_
 
 - [ ] React Router + code splitting par route
 - [ ] Store Zustand avec sélecteurs
