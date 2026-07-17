@@ -280,10 +280,14 @@ pnpm exec playwright install
 
 Being able to explain the **testing pyramid** (lots of unit tests, few E2E tests) is an easy interview point.
 
-- [ ] Vitest + RTL setup
-- [ ] Unit tests (Button, sort, search)
-- [ ] Playwright setup
-- [ ] E2E scenario
+- [x] Vitest + RTL setup
+- [x] Unit tests (Button, sort, search) — 7 tests across `Button`, `CampaignTable`, `DashboardPage`
+- [x] Playwright setup
+- [x] E2E scenario — search → open detail → back, verified against a real running dev server
+
+**Gotcha hit while wiring Vitest + RTL**: without `test.globals: true`, `@testing-library/react`'s automatic cleanup silently does nothing (it detects a global `afterEach` that doesn't exist), so renders from one test leak into the next — tests fail with "found multiple elements" errors that look like app bugs but aren't. Fixed by explicitly calling `cleanup()` in an `afterEach` inside `src/test/setup.ts`, which also fixed a Button test that looked like a real failure but was actually DOM pollution from the previous test.
+
+Also worth noting: the Zustand store is a module-level singleton, so `DashboardPage.test.tsx` resets it in a `beforeEach` — otherwise `search` state set in one test would leak into the next.
 
 ---
 
