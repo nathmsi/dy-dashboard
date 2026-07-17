@@ -9,3 +9,6 @@ export interface Campaign {
   visitors: number
   startDate: string
 }
+
+export type CampaignSortKey = 'name' | 'status' | 'conversionRate' | 'visitors' | 'startDate'
+export type SortDirection = 'asc' | 'desc'

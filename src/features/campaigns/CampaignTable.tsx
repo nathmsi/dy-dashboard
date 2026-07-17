@@ -1,9 +1,7 @@
 import { Badge } from '../../components/ui/Badge/Badge'
 import { Table } from '../../components/ui/Table/Table'
-import type { Column, SortDirection } from '../../components/ui/Table/Table'
-import type { Campaign } from '../../lib/types'
-
-export type CampaignSortKey = 'name' | 'status' | 'conversionRate' | 'visitors' | 'startDate'
+import type { Column } from '../../components/ui/Table/Table'
+import type { Campaign, CampaignSortKey, SortDirection } from '../../lib/types'
 
 interface CampaignTableProps {
   campaigns: Campaign[]

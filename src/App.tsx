@@ -1,18 +1,9 @@
-import { useState } from 'react'
-import { CampaignDetailPage } from './pages/CampaignDetailPage'
-import { DashboardPage } from './pages/DashboardPage'
-import type { Campaign } from './lib/types'
+import { AppRoutes } from './routes'
 
 function App() {
-  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null)
-
   return (
     <main>
-      {selectedCampaign ? (
-        <CampaignDetailPage campaign={selectedCampaign} onBack={() => setSelectedCampaign(null)} />
-      ) : (
-        <DashboardPage onSelectCampaign={setSelectedCampaign} />
-      )}
+      <AppRoutes />
     </main>
   )
 }

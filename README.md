@@ -150,8 +150,6 @@ src/
 - [x] CampaignDetailPage
 - [x] Accessibility (aria-sort, label, keyboard) — verified manually: search filters live, column sort toggles asc/desc with `aria-sort`, rows are keyboard-focusable and `Enter` opens the detail page, tested in both light and dark color schemes
 
-> Note: page switching currently uses local `useState` in `App.tsx` as a placeholder — real routing (React Router, URLs) lands in Phase 3.5 below.
-
 ---
 
 ### Phase 3.5 — Routing + State management (the part that speaks to the role)
@@ -250,10 +248,12 @@ const { data, isLoading, error } = useQuery({
 
 Golden rule to state: _"I don't optimize prematurely; `useMemo`/`useCallback` only when there's a real cost or a real memoization break, not out of reflex."_ Interviewers love that nuance.
 
-- [ ] React Router + route-based code splitting
-- [ ] Zustand store with selectors
-- [ ] React Query + queryClient
-- [ ] Custom hook useCampaigns()
+- [x] React Router + route-based code splitting — verified: `DashboardPage` and `CampaignDetailPage` build into separate JS/CSS chunks, real URL navigation (`/campaigns/:id`), browser back button and hard reload both work correctly
+- [x] Zustand store with selectors (`useCampaignStore`: search, sortBy, sortDirection)
+- [x] React Query + queryClient (`useCampaigns`, `useCampaign`)
+- [x] Custom hook useCampaigns()
+
+**Bug caught while testing manually**: navigating to a non-existent campaign ID crashed with `Query data cannot be undefined` — React Query forbids a `queryFn` resolving to `undefined`. Fixed by having `fetchCampaignById` resolve to `null` instead. A good reminder to actually exercise the "not found" path in the browser, not just the happy path.
 
 ---
 

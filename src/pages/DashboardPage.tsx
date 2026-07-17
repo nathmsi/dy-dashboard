@@ -1,28 +1,30 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { SearchInput } from '../components/ui/SearchInput/SearchInput'
 import { CampaignTable } from '../features/campaigns/CampaignTable'
-import type { CampaignSortKey } from '../features/campaigns/CampaignTable'
-import type { SortDirection } from '../components/ui/Table/Table'
-import { mockCampaigns } from '../lib/mockCampaigns'
-import type { Campaign } from '../lib/types'
+import { useCampaigns } from '../features/campaigns/useCampaigns'
+import { useCampaignStore } from '../stores/useCampaignStore'
 import styles from './DashboardPage.module.css'
 
-interface DashboardPageProps {
-  onSelectCampaign: (campaign: Campaign) => void
-}
+export default function DashboardPage() {
+  const search = useCampaignStore((state) => state.search)
+  const setSearch = useCampaignStore((state) => state.setSearch)
+  const sortBy = useCampaignStore((state) => state.sortBy)
+  const sortDirection = useCampaignStore((state) => state.sortDirection)
+  const toggleSort = useCampaignStore((state) => state.toggleSort)
 
-export function DashboardPage({ onSelectCampaign }: DashboardPageProps) {
-  const [search, setSearch] = useState('')
-  const [sortBy, setSortBy] = useState<CampaignSortKey>('name')
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+  const { data: campaigns, isLoading, isError } = useCampaigns()
+  const navigate = useNavigate()
 
   const visibleCampaigns = useMemo(() => {
+    if (!campaigns) return []
+
     const query = search.trim().toLowerCase()
     const filtered = query
-      ? mockCampaigns.filter((campaign) => campaign.name.toLowerCase().includes(query))
-      : mockCampaigns
+      ? campaigns.filter((campaign) => campaign.name.toLowerCase().includes(query))
+      : campaigns
 
-    const sorted = [...filtered].sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       const aValue = a[sortBy]
       const bValue = b[sortBy]
       const comparison =
@@ -31,18 +33,7 @@ export function DashboardPage({ onSelectCampaign }: DashboardPageProps) {
           : String(aValue).localeCompare(String(bValue))
       return sortDirection === 'asc' ? comparison : -comparison
     })
-
-    return sorted
-  }, [search, sortBy, sortDirection])
-
-  const handleSort = (key: CampaignSortKey) => {
-    if (key === sortBy) {
-      setSortDirection((direction) => (direction === 'asc' ? 'desc' : 'asc'))
-    } else {
-      setSortBy(key)
-      setSortDirection('asc')
-    }
-  }
+  }, [campaigns, search, sortBy, sortDirection])
 
   return (
     <div>
@@ -56,13 +47,17 @@ export function DashboardPage({ onSelectCampaign }: DashboardPageProps) {
           onChange={(event) => setSearch(event.target.value)}
         />
       </div>
-      <CampaignTable
-        campaigns={visibleCampaigns}
-        sortBy={sortBy}
-        sortDirection={sortDirection}
-        onSort={handleSort}
-        onSelectCampaign={onSelectCampaign}
-      />
+      {isLoading && <p>Loading campaigns…</p>}
+      {isError && <p role="alert">Something went wrong loading campaigns.</p>}
+      {!isLoading && !isError && (
+        <CampaignTable
+          campaigns={visibleCampaigns}
+          sortBy={sortBy}
+          sortDirection={sortDirection}
+          onSort={toggleSort}
+          onSelectCampaign={(campaign) => navigate(`/campaigns/${campaign.id}`)}
+        />
+      )}
     </div>
   )
 }
