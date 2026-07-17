@@ -398,11 +398,21 @@ The simplest and most impressive option: **Vercel** or **Netlify**.
 
 Add these if you have time, each is a talking point:
 
-- **Bundle size gate**: `pnpm add -D size-limit @size-limit/preset-app` + a CI step that fails if the bundle exceeds a budget. → "I automatically prevent perf regressions."
-- **Storybook**: `pnpm dlx storybook@latest init` — documents/isolates your UI components. Perfect for the design-system narrative.
-- **Lighthouse CI**: automated perf/accessibility audit on every PR.
-- **Visual regression**: Chromatic (via Storybook) or Playwright screenshots.
-- **Codecov**: upload the coverage report, badge in the README.
+- [x] **Bundle size gate**: `size-limit` (using `@size-limit/file`, not `@size-limit/preset-app` — that plugin assumes a Webpack entrypoint; `@size-limit/file` just measures our already-built Vite `dist/` output, which fits a Vite project). Budgets: main bundle 110 KB, each route chunk 5-10 KB, checked with `pnpm size` and enforced in CI. → "I automatically prevent perf regressions."
+- [x] **Storybook**: real stories for `Button`, `Badge`, `SearchInput`, and `CampaignTable` under `src/**/*.stories.tsx`, isolated from the app and using our actual design tokens (`.storybook/preview.tsx` imports `src/index.css`). Run with `pnpm storybook`. `pnpm build-storybook` runs in CI to catch breakage.
+- [ ] **Lighthouse CI**: automated perf/accessibility audit on every PR. (not implemented)
+- [x] **Visual regression**: Playwright screenshots (`e2e/visual.spec.ts`, `toHaveScreenshot()`) instead of Chromatic — reuses the E2E setup we already had instead of adding a paid third-party service.
+- [x] **Coverage**: Vitest v8 coverage with a **70%** threshold (lines/functions/branches/statements) enforced in `vite.config.ts` — `pnpm test:coverage` fails locally and in CI if coverage drops below that. Uploaded to Codecov in CI (`codecov/codecov-action`, `fail_ci_if_error: false` so a Codecov outage never blocks merging). **Manual step still needed**: sign in at [codecov.io](https://codecov.io) with GitHub and enable the `dy-dashboard` repo — until then, the upload step logs `Token required - not valid tokenless upload` (soft failure, doesn't block CI) because Codecov's tokenless upload for public repos only works once the repo is registered there.
+
+**Bugs caught while building these**:
+
+1. **pnpm blocks build scripts by default**: `pnpm install --frozen-lockfile` failed in CI with `[ERR_PNPM_IGNORED_BUILDS]` — pnpm 11 refuses to run a dependency's install/build script (here, esbuild's) unless explicitly allowlisted, as a supply-chain-attack guard. Worked locally because the local pnpm store already had it approved from an earlier interactive session. Fixed with `pnpm-workspace.yaml`:
+   ```yaml
+   allowBuilds:
+     esbuild: true
+   ```
+2. **Visual regression snapshot took the loading state, not the loaded page**: the first CI run wrote a screenshot showing "Loading campaigns…" instead of the table, because the test only waited for the page `<h1>` (which renders instantly) before snapshotting, not for the mock API's simulated 400ms delay to resolve. Fixed by waiting for actual row content (`getByText('Homepage Hero Banner')`) before taking the screenshot.
+3. **Snapshot filenames are platform-suffixed** (`*-darwin.png` locally vs `*-linux.png` in CI) — expected Playwright behavior, not a bug, but it means a baseline generated on a Mac is useless for Linux CI. Without Docker available locally to generate a matching baseline, the practical fix was: let CI fail once (it writes the "actual" screenshot as an artifact), download that artifact, and commit it as the real Linux baseline.
 
 ---
 

@@ -17,8 +17,12 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "e2e": "playwright test",
-    "prepare": "husky"
+    "size": "size-limit",
+    "prepare": "husky",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.2",
@@ -29,6 +33,10 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
+    "@size-limit/file": "^12.1.0",
+    "@storybook/addon-a11y": "10.5.0",
+    "@storybook/addon-docs": "10.5.0",
+    "@storybook/react-vite": "10.5.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -36,15 +44,35 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
+    "@vitest/coverage-v8": "4.1.10",
     "husky": "^9.1.7",
     "jsdom": "^29.1.1",
     "lint-staged": "^17.0.8",
     "oxlint": "^1.71.0",
     "prettier": "^3.9.5",
+    "size-limit": "^12.1.0",
+    "storybook": "10.5.0",
     "typescript": "~6.0.2",
     "vite": "^8.1.1",
     "vitest": "^4.1.10"
   },
+  "size-limit": [
+    {
+      "name": "Main bundle (JS)",
+      "path": "dist/assets/index-*.js",
+      "limit": "110 KB"
+    },
+    {
+      "name": "DashboardPage chunk",
+      "path": "dist/assets/DashboardPage-*.js",
+      "limit": "10 KB"
+    },
+    {
+      "name": "CampaignDetailPage chunk",
+      "path": "dist/assets/CampaignDetailPage-*.js",
+      "limit": "5 KB"
+    }
+  ],
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
       "oxlint --fix",
