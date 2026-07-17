@@ -4,6 +4,7 @@ test.describe('visual regression', () => {
   test('dashboard page', async ({ page }) => {
     await page.goto('/')
     await expect(page.getByRole('heading', { name: 'Campaigns' })).toBeVisible()
+    await expect(page.getByText('Homepage Hero Banner')).toBeVisible()
     await expect(page).toHaveScreenshot('dashboard.png', { fullPage: true })
   })
 
