@@ -302,9 +302,9 @@ git push -u origin main
 
 **Good practice to show**: don't push directly to `main`. Work with **branches + Pull Requests**. Enable **branch protection** on `main` (Settings → Branches) → blocks merging until CI is green. That's a senior reflex.
 
-- [ ] GitHub repo created
-- [ ] Remote configured + initial push
-- [ ] Branch protection enabled
+- [x] GitHub repo created — [github.com/nathmsi/dy-dashboard](https://github.com/nathmsi/dy-dashboard) (public)
+- [x] Remote configured + initial push
+- [x] Branch protection enabled — required PR before merge, `enforce_admins: true` (applies even to the repo owner), force-push and branch deletion blocked. Verified: a direct `git push origin main` was rejected. Required status checks (green CI) will be added once the workflow exists in Phase 6.
 
 ---
 
