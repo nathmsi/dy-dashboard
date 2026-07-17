@@ -36,7 +36,7 @@ A **pre-commit** hook (Husky + lint-staged) lints/formats changed files and runs
 
 ### Phase 0 — Prerequisites (5 min)
 
-- **Node** ≥ 20 (`node -v`). Install via nvm if needed.
+- **Node** ≥ 22.13 (`node -v`). Install via nvm if needed. (Bumped from the originally planned Node 20 — pnpm 11 requires Node ≥ 22.13; discovered when CI failed on Node 20 in Phase 6.)
 - **pnpm**: `npm install -g pnpm`.
 - **git** configured + a **GitHub** account.
 - An editor (VS Code) with ESLint + Prettier extensions.
