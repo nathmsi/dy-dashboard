@@ -310,7 +310,7 @@ git push -u origin main
 
 ### Phase 6 — CI with GitHub Actions (the core)
 
-Create `.github/workflows/ci.yml`:
+Create `.github/workflows/ci.yml`. We went straight for the "improvement to know about" from the original plan — **3 parallel jobs** instead of one sequential job — since it's barely more code and demonstrates the point directly instead of just citing it:
 
 ```yaml
 name: CI
@@ -321,26 +321,32 @@ on:
     branches: [main]
 
 jobs:
-  quality:
+  lint-typecheck-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'pnpm' # ← caches deps based on the lockfile
-
+          node-version: 22
+          cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-
       - run: pnpm lint
       - run: pnpm typecheck
+      - run: pnpm build
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      # ...same setup...
       - run: pnpm test
-      - run: pnpm build # verifies the build passes
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      # ...same setup...
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm e2e
 ```
 
 **Understand each piece**:
@@ -348,12 +354,18 @@ jobs:
 - `on:` — when it triggers (every PR + push to main).
 - `cache: 'pnpm'` — reuses deps between runs = the biggest time saver.
 - `--frozen-lockfile` — fails if the lockfile is out of date (reproducible builds).
-- The steps = your pipeline: lint → typecheck → test → build.
+- 3 independent jobs run **in parallel** on separate runners — `lint-typecheck-build`, `unit-tests`, `e2e` — instead of one long sequential pipeline.
+- `pnpm/action-setup@v4` with no `version:` — reads the `packageManager` field in `package.json` instead of a hardcoded version, so the CI pnpm version and the local one can never drift apart.
 
-**Improvement to know about** (worth mentioning in interviews): running jobs **in parallel** (lint and test in separate jobs) to speed things up, via a **matrix** if needed.
+- [x] ci.yml workflow created (3 parallel jobs)
+- [x] PR opened, CI green — [PR #2](https://github.com/nathmsi/dy-dashboard/pull/2)
 
-- [ ] ci.yml workflow created
-- [ ] PR opened, CI green
+**Two real bugs caught by CI that local testing missed**:
+
+1. **Node version mismatch**: pnpm 11 (pinned via `packageManager`) requires Node ≥ 22.13. The workflow was first written with `node-version: 20` (following the original plan literally) and failed immediately with `ERR_UNKNOWN_BUILTIN_MODULE: node:sqlite`. It "worked" locally only because the dev machine happens to run Node 24. Fixed by bumping CI (and the documented prerequisite) to Node 22.
+2. **Vitest picked up the Playwright spec**: `unit-tests` failed with `Playwright Test did not expect test() to be called here` — Vitest's default file glob matches both `*.test.*` and `*.spec.*`, so it tried to execute `e2e/campaign-flow.spec.ts` as a unit test. This slipped past local testing because `pnpm test` was last run _before_ the E2E spec file existed, and `pnpm e2e`/`pnpm test` were never run together afterward. Fixed by excluding `e2e/**` in `vite.config.ts`'s `test.exclude`. Lesson: CI catches gaps in your own verification habits, not just gaps in the code.
+
+Branch protection now also **requires all 3 jobs to pass** (`required_status_checks`, `strict: true`) before a PR can merge into `main`.
 
 ---
 
