@@ -380,9 +380,17 @@ The simplest and most impressive option: **Vercel** or **Netlify**.
 
 **Concepts this setup illustrates**: CDN, content hashing (Vite hashes file names → cache busting), atomic deployments, and — worth citing — **rollback** (Vercel keeps every deployment, you can revert in 1 click).
 
-- [ ] Vercel connected
-- [ ] First prod deployment
+- [x] Vercel connected
+- [x] First prod deployment — [dy-dashboard-five.vercel.app](https://dy-dashboard-five.vercel.app/)
 - [ ] Preview deploy verified on a PR
+
+**Bug caught by testing the deployed URL directly, not just the homepage**: navigating straight to `/campaigns/:id` on the live Vercel URL returned a `404: NOT_FOUND`. Vercel serves the `dist/` build as static files and has no built-in knowledge that this is a client-side-routed SPA — it doesn't know to fall back to `index.html` for unknown paths. The dev server (`vite dev`) and `vite preview` both handle this automatically, which is exactly why it went unnoticed until the real deployment. Fixed with a `vercel.json` rewrite:
+
+```json
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
+```
 
 ---
 
