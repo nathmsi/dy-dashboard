@@ -1,22 +1,22 @@
 # dy-dashboard
 
-Projet end-to-end : **Vite + React + TypeScript + CI/CD complet**.
+End-to-end project: **Vite + React + TypeScript + full CI/CD**.
 
-**But** : construire une app réelle, la mettre sur GitHub, et monter un pipeline CI/CD complet — pour comprendre _en faisant_ tout ce qu'on a vu dans le refresh. L'app est volontairement simple ; le cœur de l'exercice, c'est l'infra autour.
+**Goal**: build a real app, push it to GitHub, and set up a complete CI/CD pipeline — to understand _by doing_ everything covered in the refresh. The app is intentionally simple; the real exercise is the infrastructure around it.
 
-**L'app** : un mini **dashboard de personnalisation** (clin d'œil à la console Dynamic Yield) — plusieurs pages avec un routing simple : une liste de "campagnes" (table triable + recherche) et une page de détail par campagne. Assez riche pour tester des composants, le state management, l'accessibilité et la perf ; assez simple pour tenir en une session ou deux.
+**The app**: a mini **personalization dashboard** (a nod to the Dynamic Yield console) — a few pages with simple routing: a "campaigns" list (sortable table + search) and a per-campaign detail page. Rich enough to exercise components, state management, accessibility and performance; simple enough to fit in one or two sessions.
 
-**La stack** :
+**The stack**:
 
-- **Vite + React + TypeScript** — build & langage
-- **React Router** — routing (plusieurs pages)
-- **Zustand** — state global client (recherche, tri, sélection) — _c'est leur choix chez DY_
-- **TanStack Query (React Query)** — server state (les données "API")
-- **CSS Modules** — styling scopé (design tokens en variables CSS)
+- **Vite + React + TypeScript** — build & language
+- **React Router** — routing (multiple pages)
+- **Zustand** — global client state (search, sort, selection) — _their choice at DY_
+- **TanStack Query (React Query)** — server state (the "API" data)
+- **CSS Modules** — scoped styling (design tokens as CSS variables)
 - **Vitest + RTL + Playwright** — tests
 - **GitHub Actions + Vercel** — CI/CD
 
-## Lancer le projet
+## Running the project
 
 ```bash
 pnpm install
@@ -28,25 +28,25 @@ pnpm typecheck    # tsc -b
 pnpm build        # tsc -b && vite build
 ```
 
-Un hook **pre-commit** (Husky + lint-staged) lint/formate les fichiers modifiés et fait tourner `typecheck` sur tout le projet à chaque commit.
+A **pre-commit** hook (Husky + lint-staged) lints/formats changed files and runs `typecheck` on the whole project on every commit.
 
 ---
 
-## Plan complet, phase par phase
+## Full plan, phase by phase
 
-### Phase 0 — Prérequis (5 min)
+### Phase 0 — Prerequisites (5 min)
 
-- **Node** ≥ 20 (`node -v`). Sinon installe via nvm.
-- **pnpm** : `npm install -g pnpm`.
-- **git** configuré + un compte **GitHub**.
-- Un éditeur (VS Code) avec les extensions ESLint + Prettier.
+- **Node** ≥ 20 (`node -v`). Install via nvm if needed.
+- **pnpm**: `npm install -g pnpm`.
+- **git** configured + a **GitHub** account.
+- An editor (VS Code) with ESLint + Prettier extensions.
 
-- [x] Node installé
-- [x] pnpm installé
+- [x] Node installed
+- [x] pnpm installed
 
 ---
 
-### Phase 1 — Scaffold du projet (10 min)
+### Phase 1 — Project scaffold (10 min)
 
 ```bash
 pnpm create vite dy-dashboard --template react-ts
@@ -55,40 +55,40 @@ pnpm install
 pnpm dev
 ```
 
-**Ce qui se passe** : Vite génère un squelette React + TypeScript. `pnpm dev` lance le dev server (esbuild + ESM natif → démarrage instantané, HMR actif).
+**What happens**: Vite generates a React + TypeScript skeleton. `pnpm dev` starts the dev server (esbuild + native ESM → instant startup, HMR enabled).
 
-**Regarde et comprends** :
+**Look at and understand**:
 
-- `vite.config.ts` — la config du bundler.
-- `tsconfig.json` — la config TypeScript.
-- `package.json` — les scripts (`dev`, `build`, `preview`).
-- `index.html` — le point d'entrée (Vite est "HTML-first").
+- `vite.config.ts` — the bundler config.
+- `tsconfig.json` — the TypeScript config.
+- `package.json` — the scripts (`dev`, `build`, `preview`).
+- `index.html` — the entry point (Vite is "HTML-first").
 
-- [x] Scaffold fait
-- [x] Premier commit
-- [x] Exploration des fichiers de config
+- [x] Scaffold done
+- [x] First commit
+- [x] Explored config files
 
 ---
 
-### Phase 2 — Tooling qualité (20 min)
+### Phase 2 — Quality tooling (20 min)
 
-Objectif : mettre les garde-fous _avant_ d'écrire du code.
+Goal: put the guardrails in place _before_ writing any code.
 
-**Lint + format** :
+**Lint + format**:
 
-- **oxlint** = qualité (bugs, mauvaises pratiques) — gardé tel quel (déjà scaffoldé par Vite, écrit en Rust donc rapide) plutôt qu'ESLint.
-- **Prettier** = formatage (style).
+- **oxlint** = quality (bugs, bad practices) — kept as-is (already scaffolded by Vite, written in Rust so it's fast) instead of ESLint.
+- **Prettier** = formatting (style).
 
-**Pre-commit hooks (Husky + lint-staged)** :
+**Pre-commit hooks (Husky + lint-staged)**:
 
 ```bash
 pnpm add -D husky lint-staged
 pnpm exec husky init
 ```
 
-→ lint-staged lance oxlint + prettier **seulement sur les fichiers modifiés** à chaque commit. `typecheck` (`tsc -b`) tourne aussi sur tout le projet à chaque commit — le mauvais code (style, lint, ou erreur de type) n'entre jamais dans le repo.
+→ lint-staged runs oxlint + prettier **only on changed files** on every commit. `typecheck` (`tsc -b`) also runs on the whole project on every commit — bad code (style, lint, or type errors) never makes it into the repo.
 
-**Scripts ajoutés dans `package.json`** :
+**Scripts added to `package.json`**:
 
 ```json
 "scripts": {
@@ -103,56 +103,56 @@ pnpm exec husky init
 }
 ```
 
-Note : `typecheck` = `tsc -b` (project references — `tsc --noEmit` seul ne suffisait pas ici car le `tsconfig.json` racine a `"files": []` et délègue à `tsconfig.app.json` / `tsconfig.node.json` via `references`).
+Note: `typecheck` = `tsc -b` (project references — plain `tsc --noEmit` wasn't enough here because the root `tsconfig.json` has `"files": []` and delegates to `tsconfig.app.json` / `tsconfig.node.json` via `references`).
 
 - [x] Prettier
 - [x] Husky + lint-staged
-- [x] Scripts package.json
-- [x] typecheck bloqué en pre-commit (vérifié : un commit avec une erreur de type est rejeté)
+- [x] package.json scripts
+- [x] typecheck enforced in pre-commit (verified: a commit with a type error is rejected)
 
 ---
 
-### Phase 3 — Construire l'app (le gros du desktop)
+### Phase 3 — Building the app (the bulk of the work)
 
-**Structure de dossiers** (pense "design system") :
+**Folder structure** (think "design system"):
 
 ```
 src/
-  components/ui/       ← lib réutilisable : Button, Badge, Table, SearchInput (+ .module.css)
-  features/campaigns/  ← la feature métier : CampaignTable, CampaignDetail
-  pages/               ← une page par route : DashboardPage, CampaignDetailPage
-  stores/              ← les stores Zustand (ex : useCampaignStore)
-  lib/                 ← utils, types, api mock, queryClient
-  routes.tsx           ← définition des routes (React Router)
+  components/ui/       ← reusable library: Button, Badge, Table, SearchInput (+ .module.css)
+  features/campaigns/  ← the business feature: CampaignTable, CampaignDetail
+  pages/               ← one page per route: DashboardPage, CampaignDetailPage
+  stores/              ← Zustand stores (e.g. useCampaignStore)
+  lib/                 ← utils, types, mock api, queryClient
+  routes.tsx           ← route definitions (React Router)
   App.tsx
 ```
 
-**Styling — CSS Modules** : chaque composant a son `X.module.css`. Les classes sont **scopées** automatiquement (pas de collision entre composants). Mets tes **design tokens** (couleurs, espacements) dans des variables CSS globales (`:root { --color-primary: … }`) que les modules consomment → c'est le b.a.-ba d'un design system.
+**Styling — CSS Modules**: each component has its own `X.module.css`. Classes are **scoped** automatically (no collisions between components). Put your **design tokens** (colors, spacing) in global CSS variables (`:root { --color-primary: … }`) that the modules consume → that's the ABC of a design system.
 
-**Le point senior** : le dossier `components/ui/` est ta "mini librairie de composants". Tu la conçois pour être **consommée** — props claires, accessibilité intégrée. C'est exactement le discours "mon utilisateur est le dev".
+**The senior point**: the `components/ui/` folder is your "mini component library". You design it to be **consumed** — clear props, built-in accessibility. That's exactly the "my user is the developer" story.
 
-**Ce que l'app fait** :
+**What the app does**:
 
-- Route `/` → **DashboardPage** : table de campagnes triable + recherche.
-- Route `/campaigns/:id` → **CampaignDetailPage** : le détail d'une campagne.
-- Le state partagé (recherche, tri, sélection) vit dans un store Zustand ; les données viennent d'une "API" mock via React Query.
+- Route `/` → **DashboardPage**: sortable, searchable campaigns table.
+- Route `/campaigns/:id` → **CampaignDetailPage**: campaign detail.
+- Shared state (search, sort, selection) lives in a Zustand store; data comes from a mock "API" via React Query.
 
-**Accessibilité à intégrer dès le début** (revient partout dans l'offre) :
+**Accessibility to build in from the start** (comes up constantly in the role):
 
-- Table avec `<th scope="col">`, tri annoncé via `aria-sort`.
-- Recherche avec `<label>` associé.
-- Navigation clavier : lignes focusables, `Enter` pour ouvrir le détail, focus géré dans le panneau.
+- Table with `<th scope="col">`, sort announced via `aria-sort`.
+- Search with an associated `<label>`.
+- Keyboard navigation: focusable rows, `Enter` to open the detail, focus managed in the panel.
 
-- [ ] Structure de dossiers
-- [ ] Design tokens CSS
-- [ ] Composants UI de base (Button, Badge, Table, SearchInput)
-- [ ] DashboardPage (table triable + recherche)
+- [ ] Folder structure
+- [ ] CSS design tokens
+- [ ] Base UI components (Button, Badge, Table, SearchInput)
+- [ ] DashboardPage (sortable table + search)
 - [ ] CampaignDetailPage
-- [ ] Accessibilité (aria-sort, label, clavier)
+- [ ] Accessibility (aria-sort, label, keyboard)
 
 ---
 
-### Phase 3.5 — Routing + State management (le bloc qui parle au poste)
+### Phase 3.5 — Routing + State management (the part that speaks to the role)
 
 #### Routing (React Router)
 
@@ -160,23 +160,23 @@ src/
 pnpm add react-router-dom
 ```
 
-Définis 2 routes : `/` (dashboard) et `/campaigns/:id` (détail).
+Define 2 routes: `/` (dashboard) and `/campaigns/:id` (detail).
 
-**Point perf à connaître** : le **route-based code splitting** — charger le code de chaque page en `React.lazy()` + `Suspense`, pour ne pas tout mettre dans un seul bundle.
+**Perf point to know**: **route-based code splitting** — load each page's code with `React.lazy()` + `Suspense`, so you don't ship everything in a single bundle.
 
 ```tsx
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 ```
 
-→ à citer en entretien : "je split par route pour réduire le bundle initial".
+→ worth citing in interviews: "I split by route to reduce the initial bundle."
 
-#### Client state — Zustand (leur choix)
+#### Client state — Zustand (their choice)
 
 ```bash
 pnpm add zustand
 ```
 
-Un store = un hook. On y met l'état partagé + les setters :
+One store = one hook. Put shared state + setters in it:
 
 ```ts
 // stores/useCampaignStore.ts
@@ -197,14 +197,14 @@ export const useCampaignStore = create<CampaignState>((set) => ({
 }))
 ```
 
-Dans un composant, on lit **par sélecteur** (le point clé) :
+In a component, read **via a selector** (the key point):
 
 ```ts
-const search = useCampaignStore((s) => s.search) // re-render SEULEMENT si search change
+const search = useCampaignStore((s) => s.search) // re-renders ONLY when search changes
 const setSearch = useCampaignStore((s) => s.setSearch)
 ```
 
-→ le sélecteur `(s) => s.search` évite les re-renders inutiles. **C'est LE talking point perf de Zustand.**
+→ the selector `(s) => s.search` avoids unnecessary re-renders. **This is THE Zustand perf talking point.**
 
 #### Server state — React Query (TanStack Query)
 
@@ -212,12 +212,12 @@ const setSearch = useCampaignStore((s) => s.setSearch)
 pnpm add @tanstack/react-query
 ```
 
-La distinction à poser en entretien : **client state ≠ server state.**
+The distinction to raise in interviews: **client state ≠ server state.**
 
-- **Zustand** = état de l'UI (recherche, tri, sélection, thème). Ça t'appartient.
-- **React Query** = données qui viennent d'une API. Il gère pour toi le cache, le loading, les erreurs, le refetch, la déduplication.
+- **Zustand** = UI state (search, sort, selection, theme). It's yours.
+- **React Query** = data coming from an API. It handles caching, loading, errors, refetching, and deduplication for you.
 
-Setup :
+Setup:
 
 ```tsx
 // main.tsx
@@ -227,29 +227,29 @@ const queryClient = new QueryClient()
 </QueryClientProvider>
 ```
 
-Usage :
+Usage:
 
 ```ts
 const { data, isLoading, error } = useQuery({
   queryKey: ['campaigns'],
-  queryFn: fetchCampaigns, // ta fonction mock (Promise + setTimeout)
+  queryFn: fetchCampaigns, // your mock function (Promise + setTimeout)
 })
 ```
 
-→ à dire : "je ne mets jamais les données serveur dans Zustand ; le server state a son propre outil". Cette phrase seule te situe au-dessus de beaucoup de candidats.
+→ worth saying: "I never put server data in Zustand; server state has its own tool." That sentence alone puts you above a lot of candidates.
 
-#### Les hooks, bien utilisés (piège classique senior)
+#### Hooks, used properly (classic senior trap)
 
-- **`useState`** : état purement local, non partagé (un input isolé, un toggle de modale).
-- **`useEffect`** : synchroniser avec l'extérieur (abonnement, titre du document). ⚠️ pas pour dériver de la donnée — piège fréquent.
-- **`useMemo`** : mémoriser un **calcul coûteux** (ex : trier/filtrer une grande liste). Pas à mettre partout "au cas où".
-- **`useCallback`** : stabiliser une **fonction** passée à un composant enfant mémoïsé, pour éviter son re-render.
-- **Custom hook** : extraire une logique réutilisable (`useCampaigns()` qui enveloppe le `useQuery`). Montre que tu structures.
+- **`useState`**: purely local, non-shared state (an isolated input, a modal toggle).
+- **`useEffect`**: synchronize with the outside world (a subscription, the document title). ⚠️ not for deriving data — a common trap.
+- **`useMemo`**: memoize an **expensive computation** (e.g. sorting/filtering a large list). Not to sprinkle everywhere "just in case."
+- **`useCallback`**: stabilize a **function** passed to a memoized child component, to avoid re-rendering it.
+- **Custom hook**: extract reusable logic (`useCampaigns()` wrapping `useQuery`). Shows you structure your code.
 
-Règle d'or à énoncer : _"je n'optimise pas prématurément ; `useMemo`/`useCallback` seulement quand il y a un vrai coût ou une vraie casse de mémoïsation, pas par réflexe."_ Un intervieweur adore cette nuance.
+Golden rule to state: _"I don't optimize prematurely; `useMemo`/`useCallback` only when there's a real cost or a real memoization break, not out of reflex."_ Interviewers love that nuance.
 
-- [ ] React Router + code splitting par route
-- [ ] Store Zustand avec sélecteurs
+- [ ] React Router + route-based code splitting
+- [ ] Zustand store with selectors
 - [ ] React Query + queryClient
 - [ ] Custom hook useCampaigns()
 
@@ -257,54 +257,54 @@ Règle d'or à énoncer : _"je n'optimise pas prématurément ; `useMemo`/`useCa
 
 ### Phase 4 — Tests (30 min)
 
-**Unitaires / composants** :
+**Unit / component tests**:
 
 ```bash
 pnpm add -D vitest @testing-library/react @testing-library/jest-dom jsdom
 ```
 
-- **Vitest** : runner natif Vite.
-- **React Testing Library** : teste le comportement vu par l'utilisateur (clique, cherche du texte), pas l'implémentation.
-- Écris 2-3 tests : le `Button` réagit au clic, la table trie, la recherche filtre.
+- **Vitest**: Vite's native test runner.
+- **React Testing Library**: tests behavior as seen by the user (click, find text), not implementation details.
+- Write 2-3 tests: `Button` reacts to clicks, the table sorts, search filters.
 
-**E2E (bonus fort)** :
+**E2E (strong bonus)**:
 
 ```bash
 pnpm add -D @playwright/test
 pnpm exec playwright install
 ```
 
-- **Playwright** : simule un vrai navigateur. Écris 1 scénario : "je cherche une campagne → je clique → le détail s'affiche".
+- **Playwright**: simulates a real browser. Write 1 scenario: "search for a campaign → click it → the detail shows up."
 
-Savoir expliquer la **pyramide de tests** (beaucoup d'unitaires, peu d'E2E) est un point d'entretien facile.
+Being able to explain the **testing pyramid** (lots of unit tests, few E2E tests) is an easy interview point.
 
-- [ ] Setup Vitest + RTL
-- [ ] Tests unitaires (Button, tri, recherche)
-- [ ] Setup Playwright
-- [ ] Scénario E2E
+- [ ] Vitest + RTL setup
+- [ ] Unit tests (Button, sort, search)
+- [ ] Playwright setup
+- [ ] E2E scenario
 
 ---
 
 ### Phase 5 — GitHub (10 min)
 
 ```bash
-# crée un repo vide sur github.com (sans README), puis :
-git remote add origin git@github.com:TON_USER/dy-dashboard.git
+# create an empty repo on github.com (without a README), then:
+git remote add origin git@github.com:YOUR_USER/dy-dashboard.git
 git branch -M main
 git push -u origin main
 ```
 
-**Bonne pratique à montrer** : ne pushe pas direct sur `main`. Travaille en **branches + Pull Requests**. Active la **branch protection** sur `main` (Settings → Branches) → interdit le merge tant que la CI n'est pas verte. Ça, c'est un réflexe senior.
+**Good practice to show**: don't push directly to `main`. Work with **branches + Pull Requests**. Enable **branch protection** on `main` (Settings → Branches) → blocks merging until CI is green. That's a senior reflex.
 
-- [ ] Repo GitHub créé
-- [ ] Remote configuré + push initial
-- [ ] Branch protection activée
+- [ ] GitHub repo created
+- [ ] Remote configured + initial push
+- [ ] Branch protection enabled
 
 ---
 
-### Phase 6 — CI avec GitHub Actions (le cœur)
+### Phase 6 — CI with GitHub Actions (the core)
 
-Crée `.github/workflows/ci.yml` :
+Create `.github/workflows/ci.yml`:
 
 ```yaml
 name: CI
@@ -327,71 +327,71 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm' # ← cache les deps selon le lockfile
+          cache: 'pnpm' # ← caches deps based on the lockfile
 
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
-      - run: pnpm build # vérifie que le build passe
+      - run: pnpm build # verifies the build passes
 ```
 
-**Comprends chaque morceau** :
+**Understand each piece**:
 
-- `on:` — quand ça se déclenche (chaque PR + push sur main).
-- `cache: 'pnpm'` — réutilise les deps entre runs = le plus gros gain de temps.
-- `--frozen-lockfile` — échoue si le lockfile n'est pas à jour (builds reproductibles).
-- Les steps = ton pipeline : lint → typecheck → test → build.
+- `on:` — when it triggers (every PR + push to main).
+- `cache: 'pnpm'` — reuses deps between runs = the biggest time saver.
+- `--frozen-lockfile` — fails if the lockfile is out of date (reproducible builds).
+- The steps = your pipeline: lint → typecheck → test → build.
 
-**Amélioration à connaître** (à mentionner en entretien) : passer les jobs en **parallèle** (lint et test dans des jobs séparés) pour accélérer, via une **matrix** si besoin.
+**Improvement to know about** (worth mentioning in interviews): running jobs **in parallel** (lint and test in separate jobs) to speed things up, via a **matrix** if needed.
 
-- [ ] Workflow ci.yml créé
-- [ ] PR ouverte, CI verte
-
----
-
-### Phase 7 — CD : déploiement + preview (20 min)
-
-Le plus simple et le plus impressionnant : **Vercel** ou **Netlify**.
-
-- Connecte le repo GitHub à Vercel.
-- **Automatique** : chaque push sur `main` → **deploy en prod**. Chaque PR → **preview deployment** avec une URL jetable. → tu obtiens gratuitement les _preview deploys par PR_ dont on a parlé, sans config.
-
-**Si tu veux le faire "à la main"** (plus formateur, à faire en second) : un workflow GitHub Actions qui build et déploie sur **GitHub Pages** ou un bucket. Là tu gères toi-même : build → upload des assets → activation. Tu touches au vrai CD.
-
-**Concepts que ce setup illustre** : CDN, content hashing (Vite met un hash dans les noms de fichiers → cache busting), déploiement atomique, et — à savoir citer — le **rollback** (Vercel garde chaque déploiement, tu peux revenir en 1 clic).
-
-- [ ] Vercel connecté
-- [ ] Premier déploiement prod
-- [ ] Preview deploy vérifié sur une PR
+- [ ] ci.yml workflow created
+- [ ] PR opened, CI green
 
 ---
 
-### Phase 8 — Bonus qui font "senior" (optionnel)
+### Phase 7 — CD: deployment + previews (20 min)
 
-À ajouter si tu as le temps, chacun est un talking point :
+The simplest and most impressive option: **Vercel** or **Netlify**.
 
-- **Bundle size gate** : `pnpm add -D size-limit @size-limit/preset-app` + un step CI qui échoue si le bundle dépasse un budget. → "j'empêche les régressions de perf automatiquement".
-- **Storybook** : `pnpm dlx storybook@latest init` — documente/isole tes composants UI. Parfait pour le discours design system.
-- **Lighthouse CI** : audit perf/accessibilité automatisé sur chaque PR.
-- **Régression visuelle** : Chromatic (via Storybook) ou screenshots Playwright.
-- **Codecov** : upload du rapport de coverage, badge dans le README.
+- Connect the GitHub repo to Vercel.
+- **Automatic**: every push to `main` → **deploys to prod**. Every PR → **preview deployment** with a disposable URL. → you get _per-PR preview deploys_ for free, with zero config.
 
----
+**If you want to do it "by hand"** (more educational, do this second): a GitHub Actions workflow that builds and deploys to **GitHub Pages** or a bucket. There you manage it yourself: build → upload assets → activate. That's real CD.
 
-## L'ordre de priorité si tu manques de temps
+**Concepts this setup illustrates**: CDN, content hashing (Vite hashes file names → cache busting), atomic deployments, and — worth citing — **rollback** (Vercel keeps every deployment, you can revert in 1 click).
 
-1. Phases 1-2-3 : app qui tourne, proprement structurée. ✅ obligatoire
-2. Phase 5-6 : sur GitHub + CI verte. ✅ le cœur de l'exercice
-3. Phase 7 : déployé (Vercel = 10 min). ✅ boucle bouclée
-4. Phase 4 (tests) : au moins 2-3 unitaires. ⭐ important
-5. Phase 8 : un ou deux bonus. 🎁 différenciant
+- [ ] Vercel connected
+- [ ] First prod deployment
+- [ ] Preview deploy verified on a PR
 
 ---
 
-## Ce que tu pourras dire en entretien après ça
+### Phase 8 — Bonuses that make you look "senior" (optional)
 
-> "J'ai monté récemment un dashboard React/TS de zéro : routing avec code-splitting par route, state client en Zustand (sélecteurs pour éviter les re-renders) et server state en React Query, structure design-system en CSS Modules, tests Vitest + Playwright, CI GitHub Actions (lint/typecheck/test/build avec cache des deps), branch protection, et déploiement continu avec preview par PR et rollback. J'ai mis un bundle-size gate pour bloquer les régressions de perf."
+Add these if you have time, each is a talking point:
 
-Cette phrase, dite avec un vrai repo derrière, vaut dix réponses théoriques. Et tu peux partager le lien GitHub.
+- **Bundle size gate**: `pnpm add -D size-limit @size-limit/preset-app` + a CI step that fails if the bundle exceeds a budget. → "I automatically prevent perf regressions."
+- **Storybook**: `pnpm dlx storybook@latest init` — documents/isolates your UI components. Perfect for the design-system narrative.
+- **Lighthouse CI**: automated perf/accessibility audit on every PR.
+- **Visual regression**: Chromatic (via Storybook) or Playwright screenshots.
+- **Codecov**: upload the coverage report, badge in the README.
+
+---
+
+## Priority order if you're short on time
+
+1. Phases 1-2-3: an app that runs, cleanly structured. ✅ mandatory
+2. Phase 5-6: on GitHub + green CI. ✅ the core of the exercise
+3. Phase 7: deployed (Vercel = 10 min). ✅ loop closed
+4. Phase 4 (tests): at least 2-3 unit tests. ⭐ important
+5. Phase 8: one or two bonuses. 🎁 differentiator
+
+---
+
+## What you'll be able to say in interviews after this
+
+> "I recently built a React/TS dashboard from scratch: routing with route-based code splitting, client state in Zustand (selectors to avoid re-renders) and server state in React Query, a design-system structure with CSS Modules, Vitest + Playwright tests, GitHub Actions CI (lint/typecheck/test/build with dependency caching), branch protection, and continuous deployment with per-PR previews and rollback. I added a bundle-size gate to block perf regressions."
+
+That sentence, backed by a real repo, is worth ten theoretical answers. And you can share the GitHub link.
