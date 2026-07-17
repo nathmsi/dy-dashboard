@@ -23,6 +23,8 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm build
+      - run: pnpm size
+      - run: pnpm build-storybook
 
   unit-tests:
     runs-on: ubuntu-latest
@@ -38,7 +40,12 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm test
+      - run: pnpm test:coverage
+
+      - uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
 
   e2e:
     runs-on: ubuntu-latest
