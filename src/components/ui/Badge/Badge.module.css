@@ -1,0 +1,24 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.active {
+  color: var(--status-active);
+  background: var(--status-active-bg);
+}
+
+.paused {
+  color: var(--status-paused);
+  background: var(--status-paused-bg);
+}
+
+.ended {
+  color: var(--status-ended);
+  background: var(--status-ended-bg);
+}

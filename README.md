@@ -4,7 +4,7 @@ End-to-end project: **Vite + React + TypeScript + full CI/CD**.
 
 **Goal**: build a real app, push it to GitHub, and set up a complete CI/CD pipeline — to understand _by doing_ everything covered in the refresh. The app is intentionally simple; the real exercise is the infrastructure around it.
 
-**The app**: a mini **personalization dashboard** (a nod to the Dynamic Yield console) — a few pages with simple routing: a "campaigns" list (sortable table + search) and a per-campaign detail page. Rich enough to exercise components, state management, accessibility and performance; simple enough to fit in one or two sessions.
+**The app**: a mini **personalization dashboard** — a few pages with simple routing: a "campaigns" list (sortable table + search) and a per-campaign detail page. Rich enough to exercise components, state management, accessibility and performance; simple enough to fit in one or two sessions.
 
 **The stack**:
 
@@ -143,12 +143,14 @@ src/
 - Search with an associated `<label>`.
 - Keyboard navigation: focusable rows, `Enter` to open the detail, focus managed in the panel.
 
-- [ ] Folder structure
-- [ ] CSS design tokens
-- [ ] Base UI components (Button, Badge, Table, SearchInput)
-- [ ] DashboardPage (sortable table + search)
-- [ ] CampaignDetailPage
-- [ ] Accessibility (aria-sort, label, keyboard)
+- [x] Folder structure
+- [x] CSS design tokens
+- [x] Base UI components (Button, Badge, Table, SearchInput)
+- [x] DashboardPage (sortable table + search)
+- [x] CampaignDetailPage
+- [x] Accessibility (aria-sort, label, keyboard) — verified manually: search filters live, column sort toggles asc/desc with `aria-sort`, rows are keyboard-focusable and `Enter` opens the detail page, tested in both light and dark color schemes
+
+> Note: page switching currently uses local `useState` in `App.tsx` as a placeholder — real routing (React Router, URLs) lands in Phase 3.5 below.
 
 ---
 

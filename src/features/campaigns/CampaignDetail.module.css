@@ -1,0 +1,33 @@
+.detail {
+  padding: var(--space-4) 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.header h1 {
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-5) 0 0;
+}
+
+.item dt {
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: var(--space-1);
+}
+
+.item dd {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-h);
+}
