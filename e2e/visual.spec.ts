@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test'
+import { mockCampaignsApi } from './mockApi'
 
 test.describe('visual regression', () => {
+  test.beforeEach(async ({ page }) => {
+    await mockCampaignsApi(page)
+  })
+
   test('dashboard page', async ({ page }) => {
     await page.goto('/')
     await expect(page.getByRole('heading', { name: 'Campaigns' })).toBeVisible()

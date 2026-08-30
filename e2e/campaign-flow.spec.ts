@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test'
+import { mockCampaignsApi } from './mockApi'
+
+test.beforeEach(async ({ page }) => {
+  await mockCampaignsApi(page)
+})
 
 test('search for a campaign, open its detail, and go back', async ({ page }) => {
   await page.goto('/')

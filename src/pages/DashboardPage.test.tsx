@@ -3,9 +3,17 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { mockCampaigns } from '../lib/mockCampaigns'
 import { useCampaignStore } from '../stores/useCampaignStore'
 import DashboardPage from './DashboardPage'
+
+// Stub the network layer so the page test stays offline and deterministic.
+vi.mock('../lib/api', () => ({
+  fetchCampaigns: () => Promise.resolve(mockCampaigns),
+  fetchCampaignById: (id: string) =>
+    Promise.resolve(mockCampaigns.find((campaign) => campaign.id === id) ?? null),
+}))
 
 function renderWithProviders(ui: ReactNode) {
   const queryClient = new QueryClient({
