@@ -3,6 +3,13 @@ import { configDefaults, defineConfig } from 'vitest/config'
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    // Proxy API calls to the local backend so the browser sees a same-origin
+    // /api path (no CORS needed in development).
+    proxy: {
+      '/api': 'http://localhost:3001',
+    },
+  },
   plugins: [react()],
   test: {
     environment: 'jsdom',
